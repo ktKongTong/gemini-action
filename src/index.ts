@@ -48,7 +48,7 @@ const generationConfig = {
 };
 
 const buildPrompt = async () => {
-  let prompts = [] as any[];
+  let prompts = [input.prompt] as any[];
   if (input.filePath && input.fileMime) {
     const f = await uploadFile({
       token: input.token,
