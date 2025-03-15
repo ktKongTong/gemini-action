@@ -38,5 +38,5 @@ jobs:
           file-path: asset/test.mp3
           file-mime: audio/mp3
       - name: Print Output
-        id: output
+        id: file-output
         run: echo "${{ steps.test-file-action.outputs.output }}"
