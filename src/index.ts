@@ -19,18 +19,18 @@ const inputSchema = z.object({
   displayName: z.string().optional(),
 });
 const ghInput = {
-  token: core.getInput("token"),
+  token: core.getInput("token", { required: true }),
   model: core.getInput("model"),
-  systemPrompt: core.getInput("system-prompt"),
-  prompt: core.getInput("prompt"),
-  temperature: core.getInput("temperature"),
-  topP: core.getInput("topP"),
-  topK: core.getInput("topK"),
-  maxOutputTokens: core.getInput("maxOutputTokens"),
-  responseMime: core.getInput("responseMime"),
-  filePath: core.getInput("file-path"),
-  fileMime: core.getInput("file-mime"),
-  displayName: core.getInput("file-display-name"),
+  prompt: core.getInput("prompt", { required: true }),
+  systemPrompt: core.getInput("system-prompt") || undefined,
+  temperature: core.getInput("temperature") || undefined,
+  topP: core.getInput("topP") || undefined,
+  topK: core.getInput("topK") || undefined,
+  maxOutputTokens: core.getInput("maxOutputTokens") || undefined,
+  responseMime: core.getInput("responseMime") || undefined,
+  filePath: core.getInput("file-path") || undefined,
+  fileMime: core.getInput("file-mime") || undefined,
+  displayName: core.getInput("file-display-name") || undefined,
 };
 
 const input = inputSchema.parse(ghInput);
@@ -66,12 +66,15 @@ const buildPrompt = async () => {
   return prompts;
 };
 
+const contents = [{ role: "user", parts: await buildPrompt() }];
+
+if (input.systemPrompt) {
+  contents.push({ role: "system", parts: [input.systemPrompt ?? ""] });
+}
+
 const result = await model.generateContent({
   generationConfig,
-  contents: [
-    { role: "user", parts: await buildPrompt() },
-    { role: "system", parts: [input.systemPrompt ?? ""] },
-  ],
+  contents,
   systemInstruction,
 });
 

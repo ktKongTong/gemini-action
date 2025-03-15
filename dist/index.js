@@ -33862,18 +33862,18 @@ const inputSchema = z.object({
     displayName: z.string().optional(),
 });
 const ghInput = {
-    token: coreExports.getInput("token"),
+    token: coreExports.getInput("token", { required: true }),
     model: coreExports.getInput("model"),
-    systemPrompt: coreExports.getInput("system-prompt"),
-    prompt: coreExports.getInput("prompt"),
-    temperature: coreExports.getInput("temperature"),
-    topP: coreExports.getInput("topP"),
-    topK: coreExports.getInput("topK"),
-    maxOutputTokens: coreExports.getInput("maxOutputTokens"),
-    responseMime: coreExports.getInput("responseMime"),
-    filePath: coreExports.getInput("file-path"),
-    fileMime: coreExports.getInput("file-mime"),
-    displayName: coreExports.getInput("file-display-name"),
+    prompt: coreExports.getInput("prompt", { required: true }),
+    systemPrompt: coreExports.getInput("system-prompt") || undefined,
+    temperature: coreExports.getInput("temperature") || undefined,
+    topP: coreExports.getInput("topP") || undefined,
+    topK: coreExports.getInput("topK") || undefined,
+    maxOutputTokens: coreExports.getInput("maxOutputTokens") || undefined,
+    responseMime: coreExports.getInput("responseMime") || undefined,
+    filePath: coreExports.getInput("file-path") || undefined,
+    fileMime: coreExports.getInput("file-mime") || undefined,
+    displayName: coreExports.getInput("file-display-name") || undefined,
 };
 const input = inputSchema.parse(ghInput);
 coreExports.debug(`input: ${JSON.stringify(input)}`);
@@ -33904,12 +33904,13 @@ const buildPrompt = async () => {
     coreExports.debug(`prompts: ${JSON.stringify(prompts)}`);
     return prompts;
 };
+const contents = [{ role: "user", parts: await buildPrompt() }];
+if (input.systemPrompt) {
+    contents.push({ role: "system", parts: [input.systemPrompt ?? ""] });
+}
 const result = await model.generateContent({
     generationConfig,
-    contents: [
-        { role: "user", parts: await buildPrompt() },
-        { role: "system", parts: [input.systemPrompt ?? ""] },
-    ],
+    contents,
     systemInstruction,
 });
 coreExports.setOutput("output", result.response.text());

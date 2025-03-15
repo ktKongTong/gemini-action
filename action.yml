@@ -11,6 +11,7 @@ inputs:
     required: true
   model:
     description: gemini model
+    required: false
     default: "gemini-2.0-flash"
   prompt:
     description: prompt
@@ -19,19 +20,24 @@ inputs:
     description: high level prompt
     required: false
   temperature:
-    description: high level prompt
+    description: temperature
+    default: 0.6
     required: false
   topP:
     description: topP
+    default: 0.95
     required: false
   topK:
     description: topK
+    default: 40
     required: false
   maxOutputTokens:
     description: maxOutputTokens
+    default: 8192
     required: false
   responseMime:
     description: responseMime
+    default: text/plain
     required: false
   file-path:
     description: file path (only single file now)
