@@ -15,12 +15,31 @@ inputs:
   prompt:
     description: prompt
     required: true
+  system-prompt:
+    description: high level prompt
+    required: false
+  temperature:
+    description: high level prompt
+    required: false
+  topP:
+    description: topP
+    required: false
+  topK:
+    description: topK
+    required: false
+  maxOutputTokens:
+    description: maxOutputTokens
+    required: false
+  responseMime:
+    description: responseMime
+    required: false
   file-path:
     description: file path (only single file now)
     required: false
   file-mime:
     description: file mime
     required: false
+
 outputs:
   output:
     description: output

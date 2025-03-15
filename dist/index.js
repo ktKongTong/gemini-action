@@ -33839,10 +33839,24 @@ const uploadFile = async (f) => {
     return file;
 };
 
+const systemInstruction = `
+你是一个高效的智能助手，用户将给你提供一个任务。确保回答是完整的，否则用户会有更多无理的要求。
+
+你需要遵循如下的规约：
+1. 识别用户输入的语言，并确保返回的结果采用相同的语言。除非用户显式指定了响应语言。
+2. 这是一个任务，而非普通的聊天。因此响应不需要包含任何的额外内容，只需要按照用户的指令并给出结果。
+`;
+
 const inputSchema = z.object({
     token: z.string(),
     model: z.string(),
+    systemPrompt: z.string().optional(),
     prompt: z.string(),
+    temperature: z.number().optional(),
+    topP: z.number().optional(),
+    topK: z.number().optional(),
+    maxOutputTokens: z.number().optional(),
+    responseMime: z.string().optional(),
     filePath: z.string().optional(),
     fileMime: z.string().optional(),
     displayName: z.string().optional(),
@@ -33850,7 +33864,13 @@ const inputSchema = z.object({
 const ghInput = {
     token: coreExports.getInput("token"),
     model: coreExports.getInput("model"),
+    systemPrompt: coreExports.getInput("system-prompt"),
     prompt: coreExports.getInput("prompt"),
+    temperature: coreExports.getInput("temperature"),
+    topP: coreExports.getInput("topP"),
+    topK: coreExports.getInput("topK"),
+    maxOutputTokens: coreExports.getInput("maxOutputTokens"),
+    responseMime: coreExports.getInput("responseMime"),
     filePath: coreExports.getInput("file-path"),
     fileMime: coreExports.getInput("file-mime"),
     displayName: coreExports.getInput("file-display-name"),
@@ -33859,8 +33879,15 @@ const input = inputSchema.parse(ghInput);
 coreExports.debug(`input file: ${JSON.stringify(input)}`);
 const genAI = new GoogleGenerativeAI(input.token);
 const model = genAI.getGenerativeModel({ model: input.model });
+const generationConfig = {
+    temperature: input.temperature,
+    topP: input.topP,
+    topK: input.topK,
+    maxOutputTokens: input.maxOutputTokens,
+    responseMimeType: input.responseMime,
+};
 const buildPrompt = async () => {
-    let prompts = [input.prompt];
+    let prompts = [];
     if (input.filePath && input.fileMime) {
         const f = await uploadFile({
             token: input.token,
@@ -33877,6 +33904,13 @@ const buildPrompt = async () => {
     coreExports.debug(`prompts: ${JSON.stringify(prompts)}`);
     return prompts;
 };
-const result = await model.generateContent(await buildPrompt());
+const result = await model.generateContent({
+    generationConfig,
+    contents: [
+        { role: "user", parts: await buildPrompt() },
+        { role: "system", parts: [input.systemPrompt ?? ""] },
+    ],
+    systemInstruction,
+});
 coreExports.setOutput("output", result.response.text());
 //# sourceMappingURL=index.js.map

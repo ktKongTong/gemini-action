@@ -2,11 +2,18 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as core from "@actions/core";
 import { z } from "zod";
 import { uploadFile } from "./file-upload.js";
+import { systemInstruction } from "./constant.js";
 
 const inputSchema = z.object({
   token: z.string(),
   model: z.string(),
+  systemPrompt: z.string().optional(),
   prompt: z.string(),
+  temperature: z.number().optional(),
+  topP: z.number().optional(),
+  topK: z.number().optional(),
+  maxOutputTokens: z.number().optional(),
+  responseMime: z.string().optional(),
   filePath: z.string().optional(),
   fileMime: z.string().optional(),
   displayName: z.string().optional(),
@@ -14,7 +21,13 @@ const inputSchema = z.object({
 const ghInput = {
   token: core.getInput("token"),
   model: core.getInput("model"),
+  systemPrompt: core.getInput("system-prompt"),
   prompt: core.getInput("prompt"),
+  temperature: core.getInput("temperature"),
+  topP: core.getInput("topP"),
+  topK: core.getInput("topK"),
+  maxOutputTokens: core.getInput("maxOutputTokens"),
+  responseMime: core.getInput("responseMime"),
   filePath: core.getInput("file-path"),
   fileMime: core.getInput("file-mime"),
   displayName: core.getInput("file-display-name"),
@@ -26,8 +39,16 @@ const genAI = new GoogleGenerativeAI(input.token);
 
 const model = genAI.getGenerativeModel({ model: input.model });
 
+const generationConfig = {
+  temperature: input.temperature,
+  topP: input.topP,
+  topK: input.topK,
+  maxOutputTokens: input.maxOutputTokens,
+  responseMimeType: input.responseMime,
+};
+
 const buildPrompt = async () => {
-  let prompts = [input.prompt] as any[];
+  let prompts = [] as any[];
   if (input.filePath && input.fileMime) {
     const f = await uploadFile({
       token: input.token,
@@ -45,6 +66,13 @@ const buildPrompt = async () => {
   return prompts;
 };
 
-const result = await model.generateContent(await buildPrompt());
+const result = await model.generateContent({
+  generationConfig,
+  contents: [
+    { role: "user", parts: await buildPrompt() },
+    { role: "system", parts: [input.systemPrompt ?? ""] },
+  ],
+  systemInstruction,
+});
 
 core.setOutput("output", result.response.text());
