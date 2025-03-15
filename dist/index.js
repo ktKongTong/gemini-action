@@ -33850,13 +33850,13 @@ const systemInstruction = `
 const inputSchema = z.object({
     token: z.string(),
     model: z.string(),
-    systemPrompt: z.string().optional(),
+    systemPrompt: z.string().optional().catch(undefined),
     prompt: z.string(),
-    temperature: z.number().optional(),
-    topP: z.number().optional(),
-    topK: z.number().optional(),
-    maxOutputTokens: z.number().optional(),
-    responseMime: z.string().optional(),
+    temperature: z.coerce.number().optional().catch(undefined),
+    topP: z.coerce.number().optional().catch(undefined),
+    topK: z.coerce.number().optional().catch(undefined),
+    maxOutputTokens: z.coerce.number().optional().catch(undefined),
+    responseMime: z.coerce.string().optional().catch(undefined),
     filePath: z.string().optional(),
     fileMime: z.string().optional(),
     displayName: z.string().optional(),
@@ -33876,7 +33876,7 @@ const ghInput = {
     displayName: coreExports.getInput("file-display-name"),
 };
 const input = inputSchema.parse(ghInput);
-coreExports.debug(`input file: ${JSON.stringify(input)}`);
+coreExports.debug(`input: ${JSON.stringify(input)}`);
 const genAI = new GoogleGenerativeAI(input.token);
 const model = genAI.getGenerativeModel({ model: input.model });
 const generationConfig = {
