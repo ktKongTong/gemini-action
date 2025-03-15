@@ -22,7 +22,7 @@ jobs:
         id: test-action
         uses: ./
         with:
-          token: ${{ secret.GEMINI_TOKEN }}
+          token: ${{ secrets.GEMINI_TOKEN }}
           model: "gemini-2.0-flash"
           prompt: "hi"
       - name: Print Output
@@ -32,7 +32,7 @@ jobs:
         id: test-file-action
         uses: ./
         with:
-          token: ${{ secret.GEMINI_TOKEN }}
+          token: ${{ secrets.GEMINI_TOKEN }}
           model: "gemini-2.0-flash"
           prompt: "这是一个音频文件，请转为文本，并按内容进行合适的分段，同时给每个分段加上标题"
           file-path: asset/test.mp3
