@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, Part } from "@google/generative-ai";
 import * as core from "@actions/core";
 import { z } from "zod";
 import { uploadFile } from "./file-upload.js";
@@ -48,7 +48,7 @@ const generationConfig = {
 };
 
 const buildPrompt = async () => {
-  let prompts = [input.prompt] as any[];
+  let prompts = [{ text: input.prompt }] as Part[];
   if (input.filePath && input.fileMime) {
     const f = await uploadFile({
       token: input.token,
@@ -62,15 +62,16 @@ const buildPrompt = async () => {
       },
     });
   }
-  core.debug(`prompts: ${JSON.stringify(prompts)}`);
   return prompts;
 };
 
 const contents = [{ role: "user", parts: await buildPrompt() }];
 
 if (input.systemPrompt) {
-  contents.push({ role: "system", parts: [input.systemPrompt ?? ""] });
+  contents.push({ role: "system", parts: [{ text: input.systemPrompt }] });
 }
+
+core.debug(`prompts: ${JSON.stringify(contents)}`);
 
 const result = await model.generateContent({
   generationConfig,

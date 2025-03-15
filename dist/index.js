@@ -33887,7 +33887,7 @@ const generationConfig = {
     responseMimeType: input.responseMime,
 };
 const buildPrompt = async () => {
-    let prompts = [input.prompt];
+    let prompts = [{ text: input.prompt }];
     if (input.filePath && input.fileMime) {
         const f = await uploadFile({
             token: input.token,
@@ -33901,13 +33901,13 @@ const buildPrompt = async () => {
             },
         });
     }
-    coreExports.debug(`prompts: ${JSON.stringify(prompts)}`);
     return prompts;
 };
 const contents = [{ role: "user", parts: await buildPrompt() }];
 if (input.systemPrompt) {
-    contents.push({ role: "system", parts: [input.systemPrompt ?? ""] });
+    contents.push({ role: "system", parts: [{ text: input.systemPrompt }] });
 }
+coreExports.debug(`prompts: ${JSON.stringify(contents)}`);
 const result = await model.generateContent({
     generationConfig,
     contents,
