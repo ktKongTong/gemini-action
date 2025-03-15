@@ -1,0 +1,29 @@
+name: gemini-action
+description: Github Action for gemini
+author: kt
+
+branding:
+  icon: heart
+  color: red
+inputs:
+  token:
+    description: gemini token
+    required: true
+  model:
+    description: gemini model
+    default: "gemini-2.0-flash"
+  prompt:
+    description: prompt
+    required: true
+  file-path:
+    description: file path (only single file now)
+    required: false
+  file-mime:
+    description: file mime
+    required: false
+outputs:
+  output:
+    description: output
+runs:
+  using: node20
+  main: dist/index.js

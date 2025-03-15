@@ -1,0 +1,42 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test-action:
+    name: GitHub Actions Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Test Local Action
+        id: test-action
+        uses: ./
+        with:
+          token: ${{ secret.GEMINI_TOKEN }}
+          model: "gemini-2.0-flash"
+          prompt: "hi"
+      - name: Print Output
+        id: output
+        run: echo "${{ steps.test-action.outputs.output }}"
+      - name: Test Local Action
+        id: test-file-action
+        uses: ./
+        with:
+          token: ${{ secret.GEMINI_TOKEN }}
+          model: "gemini-2.0-flash"
+          prompt: "这是一个音频文件，请转为文本，并按内容进行合适的分段，同时给每个分段加上标题"
+          file-path: asset/test.mp3
+          file-mime: audio/mp3
+      - name: Print Output
+        id: output
+        run: echo "${{ steps.test-file-action.outputs.output }}"
