@@ -67,16 +67,16 @@ const buildPrompt = async () => {
 
 const contents = [{ role: "user", parts: await buildPrompt() }];
 
-if (input.systemPrompt) {
-  contents.push({ role: "system", parts: [{ text: input.systemPrompt }] });
-}
+// if (input.systemPrompt) {
+//   // contents.push({ role: "system", parts: [{ text: input.systemPrompt }] });
+// }
 
 core.debug(`prompts: ${JSON.stringify(contents)}`);
 
 const result = await model.generateContent({
   generationConfig,
   contents,
-  systemInstruction,
+  systemInstruction: `${systemInstruction} ${input?.systemPrompt ?? ""}`,
 });
 
 core.setOutput("output", result.response.text());

@@ -33904,14 +33904,14 @@ const buildPrompt = async () => {
     return prompts;
 };
 const contents = [{ role: "user", parts: await buildPrompt() }];
-if (input.systemPrompt) {
-    contents.push({ role: "system", parts: [{ text: input.systemPrompt }] });
-}
+// if (input.systemPrompt) {
+//   // contents.push({ role: "system", parts: [{ text: input.systemPrompt }] });
+// }
 coreExports.debug(`prompts: ${JSON.stringify(contents)}`);
 const result = await model.generateContent({
     generationConfig,
     contents,
-    systemInstruction,
+    systemInstruction: `${systemInstruction} ${input?.systemPrompt ?? ""}`,
 });
 coreExports.setOutput("output", result.response.text());
 //# sourceMappingURL=index.js.map
