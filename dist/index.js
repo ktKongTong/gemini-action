@@ -33904,7 +33904,7 @@ const inputSchema = z.object({
     topK: z.coerce.number().optional().catch(undefined),
     maxOutputTokens: z.coerce.number().optional().catch(undefined),
     responseMime: z.coerce.string().optional().catch(undefined),
-    responseSchema: z.preprocess((res) => JSON.parse(res), schema.optional()),
+    responseSchema: z.preprocess((res) => (res ? JSON.parse(res) : undefined), schema.optional()),
     // .catch(undefined)
     filePath: z.string().optional(),
     fileMime: z.string().optional(),

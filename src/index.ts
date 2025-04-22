@@ -20,7 +20,7 @@ const inputSchema = z.object({
   maxOutputTokens: z.coerce.number().optional().catch(undefined),
   responseMime: z.coerce.string().optional().catch(undefined),
   responseSchema: z.preprocess(
-    (res) => JSON.parse(res as any),
+    (res) => (res ? JSON.parse(res as any) : undefined),
     schema.optional(),
   ),
   // .catch(undefined)
