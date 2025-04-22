@@ -62,7 +62,7 @@ jobs:
         id: create-schema
         run: |
           ls -l .
-          echo 'json<<'EOF'' >> $GITHUB_OUTPUT
+          echo 'json<<EOF' >> $GITHUB_OUTPUT
           cat asset/schema.json >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
       - name: Print JSON Output
