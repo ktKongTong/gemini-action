@@ -8,37 +8,77 @@ on:
 permissions:
   contents: read
 
-jobs:
-  test-action:
-    name: GitHub Actions Test
-    runs-on: ubuntu-latest
+env:
+  model: "gemini-2.5-flash-preview-04-17"
 
+jobs:
+#  text-input:
+#    name: Plain text input
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        id: checkout
+#        uses: actions/checkout@v4
+#      - name: Test
+#        id: test-action
+#        uses: ./
+#        with:
+#          system-prompt: "a system prompt"
+#          token: ${{ secrets.GEMINI_TOKEN }}
+#          model: ${{ env.model }}
+#          prompt: "hi"
+#      - name: Print Output
+#        id: output
+#        run: echo "${{ steps.test-action.outputs.output }}"
+
+#  file-input:
+#    name: Audio file input
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        id: checkout
+#        uses: actions/checkout@v4
+#      - name: Test
+#        id: test-file-action
+#        uses: ./
+#        with:
+#          token: ${{ secrets.GEMINI_TOKEN }}
+#          model: ${{ env.model }}
+#          prompt: "这是一个音频文件，请转为文本，并按内容进行合适的分段，同时给每个分段加上标题"
+#          file-path: asset/test.mp3
+#          file-mime: audio/mp3
+#      - name: Print Output
+#        id: file-output
+#        run: echo "${{ steps.test-file-action.outputs.output }}"
+
+  structure-output:
+    name: Structure output
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-
-      - name: Test Local Action
-        id: test-action
-        uses: ./
-        with:
-          system-prompt: "a system prompt"
-          token: ${{ secrets.GEMINI_TOKEN }}
-          model: "gemini-2.0-flash"
-          prompt: "hi"
-      - name: Print Output
-        id: output
-        run: echo "${{ steps.test-action.outputs.output }}"
-      - name: Test Local Action
-        id: test-file-action
-        uses: ./
-        with:
-          token: ${{ secrets.GEMINI_TOKEN }}
-          model: "gemini-2.0-flash"
-          prompt: "这是一个音频文件，请转为文本，并按内容进行合适的分段，同时给每个分段加上标题"
-
-          file-path: asset/test.mp3
-          file-mime: audio/mp3
-      - name: Print Output
-        id: file-output
-        run: echo "${{ steps.test-file-action.outputs.output }}"
+      - name: Create JSON Schema
+        id: create-schema
+        run: |
+          ls -l .
+          echo 'json<<'EOF'' >> $GITHUB_OUTPUT
+          cat asset/schema.json >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+      - name: Print JSON Output
+        id: json-schema-output
+        run: echo '${{ steps.create-schema.outputs.json }}'
+#      - name: Test Local Action
+#        id: test-file-action
+#        uses: ./
+#        with:
+#          token: ${{ secrets.GEMINI_TOKEN }}
+#          model: ${{ env.model }}
+#          prompt: "这是一个音频文件，请转为文本，并按内容进行合适的分段，同时给每个分段加上标题"
+#          maxOutputTokens: '65536'
+#          responseMime: 'text/plain'
+#          file-path: asset/test.mp3
+#          file-mime: audio/mp3
+#      - name: Print Output
+#        id: file-output
+#        run: echo "${{ steps.test-file-action.outputs.output }}"

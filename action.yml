@@ -39,6 +39,10 @@ inputs:
     description: responseMime
     default: text/plain
     required: false
+  responseSchema:
+    description: responseSchema in json
+    default: text/plain
+    required: false
   file-path:
     description: file path (only single file now)
     required: false

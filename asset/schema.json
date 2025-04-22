@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "markdown": {
+      "type": "string",
+      "description": "音频转录的文本"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "对音频中所涉及话题的标签分类",
+      "maxItems": 6
+    }
+  }
+}
