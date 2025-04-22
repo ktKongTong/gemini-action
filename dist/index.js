@@ -33847,6 +33847,53 @@ const systemInstruction = `
 2. 这是一个任务，而非普通的聊天。因此响应不需要包含任何的额外内容，只需要按照用户的指令并给出结果。
 `;
 
+const baseSchema = z.object({
+    description: z.string().optional(),
+    nullable: z.boolean().optional(),
+});
+const simpleStringSchema = baseSchema.extend({
+    type: z.literal("string"),
+    format: z.literal("date-time").optional(),
+});
+const enumStringSchema = baseSchema.extend({
+    type: z.literal("string"),
+    format: z.literal("enum").optional(),
+    enum: z.string().array(),
+});
+const numberSchema = baseSchema.extend({
+    type: z.literal("number"),
+    format: z.enum(["float", "double"]).optional(),
+});
+const integerSchema = baseSchema.extend({
+    type: z.literal("integer"),
+    format: z.enum(["int32", "int64"]).optional(),
+});
+const booleanSchema = baseSchema.extend({
+    type: z.literal("boolean"),
+});
+const schema = z.lazy(() => {
+    const objectSchema = baseSchema.extend({
+        type: z.literal("object"),
+        properties: z.record(schema),
+        required: z.string().array().optional(),
+    });
+    const arraySchema = baseSchema.extend({
+        type: z.literal("array"),
+        items: schema,
+        minItems: z.coerce.number().optional(),
+        maxItems: z.coerce.number().optional(),
+    });
+    return z.union([
+        simpleStringSchema,
+        enumStringSchema,
+        numberSchema,
+        integerSchema,
+        booleanSchema,
+        arraySchema,
+        objectSchema,
+    ]);
+});
+
 const inputSchema = z.object({
     token: z.string(),
     model: z.string(),
@@ -33857,6 +33904,8 @@ const inputSchema = z.object({
     topK: z.coerce.number().optional().catch(undefined),
     maxOutputTokens: z.coerce.number().optional().catch(undefined),
     responseMime: z.coerce.string().optional().catch(undefined),
+    responseSchema: z.preprocess((res) => JSON.parse(res), schema.optional()),
+    // .catch(undefined)
     filePath: z.string().optional(),
     fileMime: z.string().optional(),
     displayName: z.string().optional(),
@@ -33871,10 +33920,12 @@ const ghInput = {
     topK: coreExports.getInput("topK") || undefined,
     maxOutputTokens: coreExports.getInput("maxOutputTokens") || undefined,
     responseMime: coreExports.getInput("responseMime") || undefined,
+    responseSchema: coreExports.getInput("responseSchema") || undefined,
     filePath: coreExports.getInput("file-path") || undefined,
     fileMime: coreExports.getInput("file-mime") || undefined,
     displayName: coreExports.getInput("file-display-name") || undefined,
 };
+coreExports.debug(`ghInput: ${JSON.stringify(ghInput)}`);
 const input = inputSchema.parse(ghInput);
 coreExports.debug(`input: ${JSON.stringify(input)}`);
 const genAI = new GoogleGenerativeAI(input.token);
@@ -33884,7 +33935,9 @@ const generationConfig = {
     topP: input.topP,
     topK: input.topK,
     maxOutputTokens: input.maxOutputTokens,
+    // 'application/json' | 'text/plain'
     responseMimeType: input.responseMime,
+    responseSchema: input.responseSchema,
 };
 const buildPrompt = async () => {
     let prompts = [{ text: input.prompt }];
