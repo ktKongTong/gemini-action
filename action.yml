@@ -33,7 +33,7 @@ inputs:
     required: false
   maxOutputTokens:
     description: maxOutputTokens
-    default: 8192
+    default: 65536
     required: false
   responseMime:
     description: responseMime
@@ -41,7 +41,6 @@ inputs:
     required: false
   responseSchema:
     description: responseSchema in json
-    default: text/plain
     required: false
   file-path:
     description: file path (only single file now)

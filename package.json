@@ -1,7 +1,7 @@
 {
   "name": "gemini-action",
   "description": "GitHub Actions for gemini",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "kt",
   "type": "module",
   "private": true,
