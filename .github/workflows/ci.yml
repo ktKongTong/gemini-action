@@ -64,7 +64,7 @@ jobs:
           ls -l .
           cat asset/schema.json
           echo 'json<<EOF' >> $GITHUB_OUTPUT
-          echo 'haha' >> $GITHUB_OUTPUT
+          cat asset/schema.json >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 # cat asset/schema.json >> $GITHUB_OUTPUT
       - name: Print JSON Output
