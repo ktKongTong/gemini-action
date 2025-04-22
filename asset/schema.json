@@ -11,6 +11,7 @@
         "type": "string"
       },
       "description": "对音频中所涉及话题的标签分类",
+      "minItems": 1,
       "maxItems": 6
     }
   }
