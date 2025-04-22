@@ -1,8 +1,13 @@
-import { GoogleGenerativeAI, Part } from "@google/generative-ai";
+import {
+  GenerationConfig,
+  GoogleGenerativeAI,
+  Part,
+} from "@google/generative-ai";
 import * as core from "@actions/core";
 import { z } from "zod";
 import { uploadFile } from "./file-upload.js";
 import { systemInstruction } from "./constant.js";
+import { schema } from "./schema.js";
 
 const inputSchema = z.object({
   token: z.string(),
@@ -14,6 +19,11 @@ const inputSchema = z.object({
   topK: z.coerce.number().optional().catch(undefined),
   maxOutputTokens: z.coerce.number().optional().catch(undefined),
   responseMime: z.coerce.string().optional().catch(undefined),
+  responseSchema: z.preprocess(
+    (res) => JSON.parse(res as any),
+    schema.optional(),
+  ),
+  // .catch(undefined)
   filePath: z.string().optional(),
   fileMime: z.string().optional(),
   displayName: z.string().optional(),
@@ -28,23 +38,26 @@ const ghInput = {
   topK: core.getInput("topK") || undefined,
   maxOutputTokens: core.getInput("maxOutputTokens") || undefined,
   responseMime: core.getInput("responseMime") || undefined,
+  responseSchema: core.getInput("responseSchema") || undefined,
   filePath: core.getInput("file-path") || undefined,
   fileMime: core.getInput("file-mime") || undefined,
   displayName: core.getInput("file-display-name") || undefined,
 };
-
+core.debug(`ghInput: ${JSON.stringify(ghInput)}`);
 const input = inputSchema.parse(ghInput);
 core.debug(`input: ${JSON.stringify(input)}`);
 const genAI = new GoogleGenerativeAI(input.token);
 
 const model = genAI.getGenerativeModel({ model: input.model });
 
-const generationConfig = {
+const generationConfig: GenerationConfig = {
   temperature: input.temperature,
   topP: input.topP,
   topK: input.topK,
   maxOutputTokens: input.maxOutputTokens,
+  // 'application/json' | 'text/plain'
   responseMimeType: input.responseMime,
+  responseSchema: input.responseSchema,
 };
 
 const buildPrompt = async () => {
