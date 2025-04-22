@@ -79,7 +79,7 @@ jobs:
           model: ${{ env.model }}
           prompt: "这是一个音频文件，请转为文本，并按内容进行合适的分段，同时给每个分段加上标题"
           maxOutputTokens: "65536"
-          responseMime: "text/plain"
+          responseMime: "application/json"
           responseSchema: ${{ steps.create-schema.outputs.JSON_RESPONSE }}
           file-path: asset/test.mp3
           file-mime: audio/mp3
