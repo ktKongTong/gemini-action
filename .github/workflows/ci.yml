@@ -64,8 +64,9 @@ jobs:
           ls -l .
           cat asset/schema.json
           echo 'json<<EOF' >> $GITHUB_OUTPUT
-          cat asset/schema.json >> $GITHUB_OUTPUT
+          echo 'haha' >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
+# cat asset/schema.json >> $GITHUB_OUTPUT
       - name: Print JSON Output
         id: json-schema-output
         run: echo '${{ steps.create-schema.outputs.json }}'
