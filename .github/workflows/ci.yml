@@ -63,13 +63,15 @@ jobs:
         run: |
           ls -l .
           cat asset/schema.json
-          echo 'json<<EOF' >> $GITHUB_OUTPUT
-          cat asset/schema.json >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
+          {
+              echo 'JSON_RESPONSE<<EOF'
+              cat asset/schema.json
+              echo EOF
+          } >> "$GITHUB_OUTPUT"
 # cat asset/schema.json >> $GITHUB_OUTPUT
       - name: Print JSON Output
         id: json-schema-output
-        run: echo '${{ steps.create-schema.outputs.json }}'
+        run: echo '${{ steps.create-schema.outputs.JSON_RESPONSE }}'
 #      - name: Test Local Action
 #        id: test-file-action
 #        uses: ./
